@@ -10,24 +10,27 @@ def parser_fichier(chemin: Path) -> pd.DataFrame:
     ext = chemin.suffix.lower()
     try:
         if ext == ".csv":
-            return pd.read_csv(chemin)
+            df= pd.read_csv(chemin)
         elif ext in [".xlsx", ".xls"]:
-            return pd.read_excel(chemin)
+            df=pd.read_excel(chemin)
         elif ext == ".pdf":
-            return parse_pdf(chemin)
-
+            df=parse_pdf(chemin)
+        else:
         # fallback si pas d'extension
-        try:
-            return pd.read_csv(chemin)
-        except:
             try:
-                return pd.read_excel(chemin)
+                return pd.read_csv(chemin)
             except:
-                raise ValueError("Format de fichier non reconnu")
+                try:
+                    return pd.read_excel(chemin)
+                except:
+                    raise ValueError("Format de fichier non reconnu")
+        if df.empty:
+            raise ValueError(f"Le fichier {ext} est vide")
+        return df  
     except Exception as e:
         raise ValueError(f"Erreur lors de la lecture du fichier: {e}")
 
-def parse_pdf(chemin: path): # parser un fichier pdf en data frame
+def parse_pdf(chemin: Path): # parser un fichier pdf en data frame
     data = []
     with pdfplumber.open(chemin) as pdf:
         for page in pdf.pages:

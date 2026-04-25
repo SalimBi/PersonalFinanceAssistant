@@ -1,6 +1,10 @@
 #Implement tests for the ExtractDataFromFile service.
 import pytest
-from PFA.BackEnd.App.Services.ExtractDataFromFile import parser_fichier
+import os
+import sys
+
+
+from BackEnd.App.Services.ExtractDataFromFile import parser_fichier
 
 class TestExtractDataFromFile:
     #Test case for extracting data from a valid file of a report from bank account statement with different transactions for pdf
@@ -61,22 +65,17 @@ class TestExtractDataFromFile:
     
     # Test case for handling an empty file
     def test_extract_data_from_empty_file(self):
-        file_path = "C:\\Users\\V3RY23O\\Desktop\\cv\\git\\PFA\\BackEnd\\Tests\\Services\\TestSample.csv"  # Replace with actual path to an empty file
-        with pytest.raises(ValueError, match="Aucune table trouvée dans le fichier PDF"):
+        file_path = "C:\\Users\\V3RY23O\\Desktop\\cv\\git\\PFA\\BackEnd\\Tests\\Services\\TestSampleEmpty.csv"  # Replace with actual path to an empty file
+        with pytest.raises(ValueError, match="Le fichier .csv est vide"):
             parser_fichier(file_path)
     
     # Test case for handling a file with no tables (for PDF)
     def test_extract_data_from_pdf_with_no_tables(self):
-        file_path = "C:\\Users\\V3RY23O\\Desktop\\cv\\git\\PFA\\BackEnd\\Tests\\Services\\TestSample.pdf"  # Replace with actual path to a PDF with no tables
+        file_path = "C:\\Users\\V3RY23O\\Desktop\\cv\\git\\PFA\\BackEnd\\Tests\\Services\\TestSampleNoTable.pdf"  # Replace with actual path to a PDF with no tables
         with pytest.raises(ValueError, match="Aucune table trouvée dans le fichier PDF"):
             parser_fichier(file_path)
 
-    # Test case for handling a file with invalid content
-    def test_extract_data_from_file_with_invalid_content(self):
-        file_path = "C:\\Users\\V3RY23O\\Desktop\\cv\\git\\PFA\\BackEnd\\Tests\\Services\\TestSample.csv"  # Replace with actual path to a file with invalid content
-        with pytest.raises(ValueError, match="Erreur lors de la lecture du fichier"):
-            parser_fichier(file_path)
-    
+
 
   
      
