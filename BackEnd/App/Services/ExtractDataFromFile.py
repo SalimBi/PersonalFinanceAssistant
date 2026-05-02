@@ -38,8 +38,21 @@ def parse_pdf(chemin: Path): # parser un fichier pdf en data frame
 
     if not data:
         raise ValueError("Aucune table trouvée dans le fichier PDF")
+ 
+    columns = data[0]
+    # Dédupliquer les noms de colonnes
+    seen = {}
+    unique_columns = []
+    for col in columns:
+        col = str(col) if col else "column"
+        if col in seen:
+            seen[col] += 1
+            unique_columns.append(f"{col}_{seen[col]}")
+        else:
+            seen[col] = 0
+            unique_columns.append(col)
 
-    return pd.DataFrame(data[1:], columns=data[0])
+    return pd.DataFrame(data[1:], columns=unique_columns)
 
 
 # Verifier que le fichier fonctionne
