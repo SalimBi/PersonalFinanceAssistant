@@ -23,13 +23,26 @@ def _connect_to_container():
 def azureBlobUpload(file):
     try:
         container_client = _connect_to_container()
-        blob_client = container_client.get_blob_client(file.filename)
+        filename=file.filename
+        blob_client = container_client.get_blob_client(filename)
         blob_client.upload_blob(file.file, overwrite=True)
-        url_file=blob_client.url
+        
     except Exception as e:
         raise ValueError(f"Erreur lors de l'upload du fichier: {e}")
 
-    return url_file
+    return filename
+
+def azureBlobGetFile(filename):
+    try:
+        container_client = _connect_to_container()
+        blob_client = container_client.get_blob_client(filename)
+        # Download the blob's content
+        blob_data = blob_client.download_blob()
+        file_content = blob_data.readall()  # Read the entire content of the file
+    except Exception as e:
+        raise ValueError(f"Erreur lors de la récupération du fichier: {e}")
+
+    return file_content  # Return the file's content
 
 def azureBlobGet():
     try:

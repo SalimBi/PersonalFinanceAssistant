@@ -1,7 +1,7 @@
 from fastapi import HTTPException, FastAPI,UploadFile, Query, File
 from fastapi.responses import Response
-from BackEnd.App.Services.ExtractDataFromFile import parser_fichier
-from BackEnd.App.Services.AsureBlobServices import azureBlobUpload,azureBlobGet
+from BackEnd.App.Services.ExtractDataFromFile import parser_fichier,parser_fichier_bytes
+from BackEnd.App.Services.AsureBlobServices import azureBlobUpload,azureBlobGet,azureBlobGetFile
  
  
 app = FastAPI() # Create a FastAPI instance
@@ -17,7 +17,7 @@ def get_message():
         raise HTTPException(status_code=500, detail=str(e))
  
 @app.get("/getMessage/{name}") # Define a GET endpoint at /getMessage    
-def get_message(name=""):
+def get_message(name: str):
     try:
         return {f"Hello {name.upper()}"} # Return a JSON response with a message
     except Exception as e:
@@ -39,8 +39,25 @@ def upload_file(file: UploadFile = File(...)):
     #put the file in azure blob storage and return the url of the file
     data = azureBlobUpload(file) 
     return data
+
 @app.get("/azureStFiles") # Define a PUT endpoint at /uploadFile
 def get_files():
     #put the file in azure blob storage and return the url of the file
     data = azureBlobGet() 
     return data
+
+@app.get("/azureStFileByFileName/{filename}") #
+def get_fileByfileName(filename):
+    file_content = azureBlobGetFile(filename)
+    return file_content
+
+@app.put("/processParsingFile") # Define a PUT endpoint at /uploadFile
+def processParsingFile(file: UploadFile = File(...)):
+    try:
+        filename = azureBlobUpload(file)
+        file_content = azureBlobGetFile(filename)
+        data = parser_fichier_bytes(file_content, filename)
+        json_str = data.to_json(orient="records", force_ascii=False)
+        return Response(content=json_str, media_type="application/json")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
